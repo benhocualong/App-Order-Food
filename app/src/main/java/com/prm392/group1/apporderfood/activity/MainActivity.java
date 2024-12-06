@@ -1,4 +1,4 @@
-package com.prm392.group1.apporderfood;
+package com.prm392.group1.apporderfood.activity;
 
 import android.os.Bundle;
 
@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.prm392.group1.apporderfood.R;
 
 public class MainActivity extends AppCompatActivity {
 
