@@ -12,11 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppOrderFood"
         tools:targetApi="31">
-<!--        <activity-->
-<!--            android:name=".activity.CartActivity"-->
-<!--            android:exported="false" />-->
         <activity
             android:name=".activity.CartActivity"
+            android:exported="false" />
+        <provider
+            android:name=".provider.ContentProviderHelper"
+            android:authorities="com.prm392.group1.apporderfood.provider"
+            android:exported="false" />
+        <activity
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
