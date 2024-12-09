@@ -1,5 +1,6 @@
 package com.prm392.group1.apporderfood.activity;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,24 +8,25 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.prm392.group1.apporderfood.R;
 import com.prm392.group1.apporderfood.adapter.CartAdapter;
 import com.prm392.group1.apporderfood.adapter.DiscountAdapter;
+import com.prm392.group1.apporderfood.database.CartItemDatabase;
 import com.prm392.group1.apporderfood.model.CartItem;
 import com.prm392.group1.apporderfood.model.Discount;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -35,7 +37,7 @@ public class CartActivity extends AppCompatActivity {
     private RecyclerView recyclerCartView;
     private TextView total, discountAddText;
 
-    List<CartItem> cartItems;
+    private CartItemDatabase cartItemDatabase;
 
     private PopupWindow popupWindow;
     private List<Discount> discountCodes = Arrays.asList(
@@ -44,16 +46,11 @@ public class CartActivity extends AppCompatActivity {
             new Discount(3, "Mã Giảm Giá 30%", 30.0, new Date(System.currentTimeMillis() + 172800000)) // 2 ngày sau
     );
 
-    private void fakeData() {
-        cartItems = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            cartItems.add(new CartItem("Hang 1", "100000 VNĐ"));
-        }
-    }
-
     Button addDiscountBtn, btnCheckout;
 
-    DiscountAdapter adapter;
+    DiscountAdapter discountAdapter;
+
+    CartAdapter cartAdapter;
 
 
     @Override
@@ -67,7 +64,6 @@ public class CartActivity extends AppCompatActivity {
             return insets;
         });
         initView();
-        fakeData();
         handleAddDiscountBtn();
         initRecyclerCarView();
         initRecyclerDiscountView();
@@ -77,14 +73,20 @@ public class CartActivity extends AppCompatActivity {
     private void initRecyclerDiscountView() {
         View popupView = LayoutInflater.from(this).inflate(R.layout.discout_list, null);
         recyclerDiscountView = popupView.findViewById(R.id.recyclerView);
-        recyclerDiscountView.setAdapter(adapter);
+        recyclerDiscountView.setAdapter(discountAdapter);
         recyclerDiscountView.setLayoutManager(new LinearLayoutManager(this));
         popupWindow = new PopupWindow(popupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     }
 
     private void initRecyclerCarView() {
-        CartAdapter adapter = new CartAdapter(cartItems);
-        recyclerCartView.setAdapter(adapter);
+        recyclerCartView.setAdapter(cartAdapter);
+        recyclerCartView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                super.getItemOffsets(outRect, view, parent, state);
+                outRect.set(0, 0, 0, 0);
+            }
+        });
         recyclerCartView.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -101,6 +103,10 @@ public class CartActivity extends AppCompatActivity {
         popupWindow.dismiss();
     }
 
+    public void onChangeCartQuantity(CartItem cartItem) {
+        Toast.makeText(this, String.valueOf(cartItem.getQuantity()), Toast.LENGTH_SHORT).show();
+    }
+
     private String formatDate(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         return formatter.format(date);
@@ -111,9 +117,11 @@ public class CartActivity extends AppCompatActivity {
         discountAddText = findViewById(R.id.discountAddText);
         btnCheckout = findViewById(R.id.btnCheckout);
         addDiscountBtn = findViewById(R.id.btnDiscountPopup);
-        adapter = new DiscountAdapter(discountCodes, this::onDiscountSelected);
+        discountAdapter = new DiscountAdapter(discountCodes, this::onDiscountSelected);
         recyclerCartView = findViewById(R.id.cartView);
+        cartItemDatabase = new CartItemDatabase(this);
+        cartAdapter = new CartAdapter(cartItemDatabase);
+        initRecyclerCarView();
     }
-
 
 }
