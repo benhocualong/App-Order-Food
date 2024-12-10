@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.prm392.group1.apporderfood"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
