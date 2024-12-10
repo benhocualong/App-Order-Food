@@ -16,27 +16,16 @@
             android:name=".activity.ListProductsActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.AddEditUserActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.UserManagementActivity"
-            android:exported="false" />
-<!--        <activity-->
-<!--            android:name=".activity.CartActivity"-->
-<!--            android:exported="false" />-->
-
-        <provider
-            android:name=".provider.CartItemProvider"
-            android:authorities="com.prm392.group1.apporderfood.provider.CartItemProvider"
-            android:exported="false" />
-
-        <provider
-            android:name=".provider.CartProvider"
-            android:authorities="com.prm392.group1.apporderfood.provider.CartProvider"
-            android:exported="false" />
-
-        <activity
             android:name=".activity.CartActivity"
+            android:exported="false" />
+
+        <provider
+            android:name=".provider.ContentProviderHelper"
+            android:authorities="com.prm392.group1.apporderfood.provider"
+            android:exported="false" />
+
+        <activity
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
