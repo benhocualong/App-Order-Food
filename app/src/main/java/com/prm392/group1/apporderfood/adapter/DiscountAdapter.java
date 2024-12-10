@@ -44,7 +44,6 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
         holder.nameTextView.setText(code.getName());
         holder.percentageTextView.setText(String.format("%.2f%%", code.getPercentage()));
         holder.expirationDateTextView.setText(formatDate(code.getExpirationDate()));
-
         holder.applyButton.setOnClickListener(v -> selectDiscountCode(code));
     }
 

@@ -13,6 +13,7 @@ import com.prm392.group1.apporderfood.R;
 import com.prm392.group1.apporderfood.database.CartItemDatabase;
 import com.prm392.group1.apporderfood.helper.Constant;
 import com.prm392.group1.apporderfood.model.CartItem;
+import com.prm392.group1.apporderfood.model.Discount;
 
 import java.util.List;
 
@@ -20,11 +21,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     private List<CartItem> data;
 
-    private CartItemDatabase db;
+    CartItemDatabase db;
 
-    public CartAdapter(CartItemDatabase db) {
-        this.db = db;
-        this.data = db.getAllCartItems();
+    private OnChangeQuantityListener listener;
+
+    public interface OnChangeQuantityListener {
+        void onChangeQuantity(CartItem cartItemList);
+    }
+
+    public CartAdapter(List<CartItem> cartList, OnChangeQuantityListener listener) {
+        this.data = cartList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -39,27 +46,31 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         CartItem cartItem = data.get(position);
         holder.setCart(cartItem);
-        int quantity = cartItem.getQuantity();
-        holder.cartQuantity.setText(String.valueOf(quantity));
+        holder.cartQuantity.setText(String.valueOf(cartItem.getQuantity()));
+        holder.productOrderPrice.setText(String.valueOf(cartItem.getProductOrderPrice()));
         holder.btnPlus.setOnClickListener(v -> {
-            int newQuantity = quantity + 1;
-            changeQuantity(position, cartItem, newQuantity);
+            int newQuantity = cartItem.getQuantity() + 1;
+            cartItem.setQuantity(newQuantity);
+            cartItem.setProductOrderPrice(cartItem.getProductPrice() * newQuantity);
+            updateCartItem(position, cartItem);
         });
 
         holder.btnMinus.setOnClickListener(v -> {
-            if (quantity > 1) {
-                int newQuantity = quantity - 1;
-                changeQuantity(position, cartItem, newQuantity);
+            if (cartItem.getQuantity() > 1) {
+                int newQuantity = cartItem.getQuantity() - 1;
+                cartItem.setQuantity(newQuantity);
+                cartItem.setProductOrderPrice(cartItem.getProductPrice() * newQuantity);
+                updateCartItem(position, cartItem);
+
             }
         });
     }
 
-    private void changeQuantity(int position, CartItem cartItem, int newQuantity) {
-        int rowsAffected = db.updateCartItem(cartItem.getId(), newQuantity);
-        if (rowsAffected > 0) {
-            cartItem.setQuantity(newQuantity);
-            data.set(position, cartItem);
-            notifyItemChanged(position);
+    private void updateCartItem(int position, CartItem cartItem) {
+        data.set(position, cartItem);
+        notifyItemChanged(position);
+        if (listener != null) {
+            listener.onChangeQuantity(cartItem);
         }
     }
 

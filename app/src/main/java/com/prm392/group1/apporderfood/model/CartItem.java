@@ -11,13 +11,14 @@ public class CartItem {
 
     private int quantity;
 
-    private int productOrderPrice;
+    private double productOrderPrice;
 
-    private int productPrice;
+    private double productPrice;
 
     private int cartId;
 
-    public CartItem(int id, String productName, String productImage, int quantity, int productOrderPrice, int productPrice, int cartId) {
+
+    public CartItem(int id, String productName, String productImage, int quantity, double productOrderPrice, double productPrice, int cartId) {
         this.id = id;
         this.productName = productName;
         this.productImage = productImage;
@@ -67,19 +68,19 @@ public class CartItem {
         this.quantity = quantity;
     }
 
-    public int getProductOrderPrice() {
+    public double getProductOrderPrice() {
         return productOrderPrice;
     }
 
-    public void setProductOrderPrice(int productOrderPrice) {
+    public void setProductOrderPrice(double productOrderPrice) {
         this.productOrderPrice = productOrderPrice;
     }
 
-    public int getProductPrice() {
+    public double getProductPrice() {
         return productPrice;
     }
 
-    public void setProductPrice(int productPrice) {
+    public void setProductPrice(double productPrice) {
         this.productPrice = productPrice;
     }
 }

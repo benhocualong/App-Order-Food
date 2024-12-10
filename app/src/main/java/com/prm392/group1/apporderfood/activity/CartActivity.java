@@ -22,7 +22,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.prm392.group1.apporderfood.R;
 import com.prm392.group1.apporderfood.adapter.CartAdapter;
 import com.prm392.group1.apporderfood.adapter.DiscountAdapter;
+import com.prm392.group1.apporderfood.database.CartDatabase;
 import com.prm392.group1.apporderfood.database.CartItemDatabase;
+import com.prm392.group1.apporderfood.helper.Constant;
+import com.prm392.group1.apporderfood.model.Cart;
 import com.prm392.group1.apporderfood.model.CartItem;
 import com.prm392.group1.apporderfood.model.Discount;
 
@@ -35,11 +38,15 @@ public class CartActivity extends AppCompatActivity {
 
     private RecyclerView recyclerDiscountView;
     private RecyclerView recyclerCartView;
-    private TextView total, discountAddText;
-
+    private TextView totalOrder, discountAddText, totalShip, totalDiscount, totalAmount;
     private CartItemDatabase cartItemDatabase;
+    private CartDatabase database;
 
     private PopupWindow popupWindow;
+
+    private List<CartItem> cartItemList;
+
+    private Cart cart;
     private List<Discount> discountCodes = Arrays.asList(
             new Discount(1, "Mã Giảm Giá 10%", 10.0, new Date()),
             new Discount(2, "Mã Giảm Giá 20%", 20.0, new Date(System.currentTimeMillis() + 86400000)), // 1 ngày sau
@@ -64,10 +71,28 @@ public class CartActivity extends AppCompatActivity {
             return insets;
         });
         initView();
-        handleAddDiscountBtn();
+        loadData();
+        bindingData();
         initRecyclerCarView();
         initRecyclerDiscountView();
+        handleAddDiscountBtn();
+    }
 
+    private void bindingData() {
+        totalOrder.setText(cart.getTotalPrice() + " " + Constant.VND);
+        totalShip.setText(cart.getTotalShip() + " " + Constant.VND);
+        totalDiscount.setText(cart.getTotalDiscount() + " " + Constant.VND);
+        totalAmount.setText(cart.getTotalPrice() + " " + Constant.VND);
+    }
+
+    private void loadData() {
+        cartItemDatabase = new CartItemDatabase(this);
+        database = new CartDatabase(this);
+        cart = database.getCart();
+        if(cart != null){
+            cartItemList = cartItemDatabase.getAllCartItemsByCartId(cart.getId());
+            cart.setCartItemList(cartItemList);
+        }
     }
 
     private void initRecyclerDiscountView() {
@@ -79,6 +104,7 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void initRecyclerCarView() {
+        cartAdapter = new CartAdapter(cartItemList, this::onChangeQuantity);
         recyclerCartView.setAdapter(cartAdapter);
         recyclerCartView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
@@ -103,6 +129,15 @@ public class CartActivity extends AppCompatActivity {
         popupWindow.dismiss();
     }
 
+    public void onChangeQuantity(CartItem cartItem) {
+        cartItemDatabase.updateCartItem(cartItem);
+        cart.setTotalPrice(cartItemList.stream().mapToDouble(CartItem::getProductOrderPrice).sum());
+        cart.setTotalAmount(cart.getTotalPrice()+cart.getTotalShip() - cart.getTotalDiscount());
+        totalOrder.setText(cart.getTotalPrice() + " " + Constant.VND);
+        totalAmount.setText(cart.getTotalAmount() + " " + Constant.VND);
+        database.updateCart(cart);
+    }
+
     public void onChangeCartQuantity(CartItem cartItem) {
         Toast.makeText(this, String.valueOf(cartItem.getQuantity()), Toast.LENGTH_SHORT).show();
     }
@@ -113,15 +148,15 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        total = findViewById(R.id.totalOrder);
+        totalOrder = findViewById(R.id.totalOrder);
         discountAddText = findViewById(R.id.discountAddText);
         btnCheckout = findViewById(R.id.btnCheckout);
         addDiscountBtn = findViewById(R.id.btnDiscountPopup);
         discountAdapter = new DiscountAdapter(discountCodes, this::onDiscountSelected);
         recyclerCartView = findViewById(R.id.cartView);
-        cartItemDatabase = new CartItemDatabase(this);
-        cartAdapter = new CartAdapter(cartItemDatabase);
-        initRecyclerCarView();
+        totalShip = findViewById(R.id.totalShip);
+        totalDiscount = findViewById(R.id.totaDiscount);
+        totalAmount = findViewById(R.id.totalAmount);
     }
 
 }
