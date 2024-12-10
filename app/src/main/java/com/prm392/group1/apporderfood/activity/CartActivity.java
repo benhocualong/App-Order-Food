@@ -81,7 +81,6 @@ public class CartActivity extends AppCompatActivity {
     private void bindingData() {
         totalOrder.setText(cart.getTotalPrice() + " " + Constant.VND);
         totalShip.setText(cart.getTotalShip() + " " + Constant.VND);
-        totalDiscount.setText(cart.getTotalDiscount() + " " + Constant.VND);
         totalAmount.setText(cart.getTotalPrice() + " " + Constant.VND);
     }
 
