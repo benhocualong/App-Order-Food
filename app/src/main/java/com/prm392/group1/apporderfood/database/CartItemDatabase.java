@@ -1,5 +1,6 @@
 package com.prm392.group1.apporderfood.database;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -29,9 +30,9 @@ public class CartItemDatabase {
         this.context = context;
     }
 
-    public List<CartItem> getAllCartItems() {
-        Uri uri = Uri.parse(CartItemProvider.CONTENT_URI.toString());
-        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+    public List<CartItem> getAllCartItemsByCartId(int cartId) {
+        Uri cartUri = ContentUris.withAppendedId(CartItemProvider.CONTENT_URI, cartId);
+        Cursor cursor = context.getContentResolver().query(cartUri, null, null, null, null);
         List<CartItem> items = new ArrayList<>();
         if (cursor != null && cursor.moveToFirst()) {
             do {
@@ -46,10 +47,10 @@ public class CartItemDatabase {
                 String productImage = cursor.getString(productImageIndex);
                 String productName = cursor.getString(productNameIndex);
                 int quantity = cursor.getInt(quantityIndex);
-                int orderPrice = cursor.getInt(orderPriceIndex);
-                int productPrice = cursor.getInt(productPriceIndex);
-                int cartId = cursor.getInt(cartIdIndex);
-                CartItem item = new CartItem(id, productName, productImage, quantity, orderPrice, productPrice, cartId);
+                double orderPrice = cursor.getDouble(orderPriceIndex);
+                double productPrice = cursor.getDouble(productPriceIndex);
+                int cartIdDb = cursor.getInt(cartIdIndex);
+                CartItem item = new CartItem(id, productName, productImage, quantity, orderPrice, productPrice, cartIdDb);
                 items.add(item);
             } while (cursor.moveToNext());
         }
@@ -59,10 +60,11 @@ public class CartItemDatabase {
         return items;
     }
 
-    public int updateCartItem(int id, int newQuantity) {
+    public int updateCartItem(CartItem cartItem) {
         ContentValues values = new ContentValues();
-        values.put("quantity", newQuantity);
-        Uri uri = Uri.parse(CartItemProvider.CONTENT_URI.toString() + "/" + id);
+        values.put(CartItemDatabase.COLUMN_PRODUCT_QUANTITY, cartItem.getQuantity());
+        values.put(CartItemDatabase.COLUMN_ORDER_PRICE, cartItem.getProductOrderPrice());
+        Uri uri = Uri.parse(CartItemProvider.CONTENT_URI.toString() + "/" + cartItem.getId());
         return context.getContentResolver().update(uri, values, null, null);
     }
 }
