@@ -4,11 +4,11 @@ public class Product {
     private int id;
     private String name;
     private String description;
-    private double price;
-    private String image;  // Link ảnh sản phẩm
+    private CharSequence price;
+    private int image; // ID của ảnh sản phẩm;
     private String category;
 
-    public Product(int id, String name, String description, double price, String image, String category) {
+    public Product(int id, String name, String description, CharSequence price, int image, String category) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -41,19 +41,19 @@ public class Product {
         this.description = description;
     }
 
-    public double getPrice() {
+    public CharSequence getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(CharSequence price) {
         this.price = price;
     }
 
-    public String getImage() {
+    public int getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(int image) {
         this.image = image;
     }
 

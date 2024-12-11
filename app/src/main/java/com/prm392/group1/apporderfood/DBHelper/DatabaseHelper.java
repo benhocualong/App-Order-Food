@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.prm392.group1.apporderfood.model.Product;
 import com.prm392.group1.apporderfood.model.User;
 
 import java.util.ArrayList;
@@ -41,6 +42,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_PHONE + " TEXT, " +
                 COLUMN_MAIL + " TEXT)";
         db.execSQL(createTable);
+
+        db.execSQL("CREATE TABLE products(id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "name TEXT, description TEXT, price REAL, image TEXT, category TEXT)");
     }
 
     @Override
@@ -125,5 +129,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteUser(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_USER, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+    }
+
+    public void insertProduct(Product product) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("INSERT INTO products(name, description, price, image, category) VALUES(?, ?, ?, ?, ?)",
+                new Object[]{product.getName(), product.getDescription(), product.getPrice(), product.getImage(), product.getCategory()});
+        db.close();
+    }
+
+    public void updateProduct(String name, String description, CharSequence price, int image, String category, String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE products SET name=?, description=?, price=?, image=?, category=? WHERE id=?",
+                new Object[]{name, description, price, image, category, id});
+        db.close();
+    }
+
+    public void deleteProduct(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM products WHERE id=?", new Object[]{id});
+        db.close();
+    }
+
+    public Cursor getAllProducts() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM products ORDER BY id DESC", null);
     }
 }

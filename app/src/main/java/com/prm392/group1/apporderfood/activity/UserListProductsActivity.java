@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,13 +17,17 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.prm392.group1.apporderfood.R;
 import com.prm392.group1.apporderfood.adapter.ProductAdapter;
+import com.prm392.group1.apporderfood.adapter.UserProductAdapter;
 import com.prm392.group1.apporderfood.helper.DatabaseHelper;
 import com.prm392.group1.apporderfood.model.Product;
+
 import java.util.ArrayList;
 
-public class ListProductsActivity extends AppCompatActivity {
+public class UserListProductsActivity extends AppCompatActivity {
+
     RecyclerView recyclerView;
     ArrayList<Product> productList = new ArrayList<>();
     DatabaseHelper db;
@@ -31,17 +36,17 @@ public class ListProductsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_list_products);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.recyclerViewProducts), (v, insets) -> {
+        setContentView(R.layout.activity_user_list_products);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.recyclerViewUserProducts), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        recyclerView = findViewById(R.id.recyclerViewProducts);
+        recyclerView = findViewById(R.id.recyclerViewUserProducts);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         db = new DatabaseHelper(this);
-        // Check db empty thì add data mẫu
         if (db.getAllProducts().getCount() == 0) {
             db.insertProduct(new Product(1, "Pizza Margherita", "Delicious cheese and tomato pizza", "8.99 USD", R.drawable.ic_food, "Italian"));
             db.insertProduct(new Product(2, "Burger Classic", "Juicy beef burger with fresh veggies", "6.49 USD", R.drawable.ic_food, "American"));
@@ -62,13 +67,13 @@ public class ListProductsActivity extends AppCompatActivity {
                     cursor.getString(5)
             ));
         }
-        ProductAdapter adapter = new ProductAdapter(productList,this);
+        UserProductAdapter adapter = new UserProductAdapter(productList,this);
         recyclerView.setAdapter(adapter);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_list_products, menu);
+        getMenuInflater().inflate(R.menu.menu_for_user, menu);
         return true;
     }
 
@@ -76,45 +81,12 @@ public class ListProductsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.menu_add_product) {
-            showAddProductDialog();
-            return true;
-        } else if (id == R.id.menu_search_product) {
+        if (id == R.id.menu_search_product) {
             showSearchProductDialog();
             return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void showAddProductDialog() {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_add_product);
-
-        EditText edtName = dialog.findViewById(R.id.edtProductName);
-        EditText edtPrice = dialog.findViewById(R.id.edtProductPrice);
-        EditText edtDescription = dialog.findViewById(R.id.edtProductDescription);
-        EditText edtCategory = dialog.findViewById(R.id.edtProductCategory);
-        Button btnAdd = dialog.findViewById(R.id.btnAddProduct);
-
-        btnAdd.setOnClickListener(v -> {
-            String name = edtName.getText().toString();
-            String price = edtPrice.getText().toString();
-            String description = edtDescription.getText().toString();
-            String category = edtCategory.getText().toString();
-
-            if (name.isEmpty() || price.isEmpty() || description.isEmpty() || category.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields!", Toast.LENGTH_SHORT).show();
-            } else {
-                DatabaseHelper db = new DatabaseHelper(this);
-                db.insertProduct(new Product(0, name, description, price, R.drawable.ic_food, category));
-                productList.add(new Product(0, name, description, price, R.drawable.ic_food, category));
-                recyclerView.getAdapter().notifyDataSetChanged();
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
     }
 
     private void showSearchProductDialog() {
